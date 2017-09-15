@@ -451,12 +451,15 @@ def create_uinput_device(mapping):
 
 def parse_uinput_mapping(name, mapping):
     """Parses a dict of mapping options."""
-    axes, buttons, mouse, mouse_options = {}, {}, {}, {}
+    axes, buttons, hats, mouse, mouse_options = {}, {}, {}, {}, {}
     description = "ds4drv custom mapping ({0})".format(name)
 
     for key, attr in mapping.items():
         key = key.upper()
-        if key.startswith("BTN_") or key.startswith("KEY_"):
+        if key.startswith("ABS_HAT"):
+            t = attr.replace(' ', '').split(',')
+            hats[key] = (t[0], t[1])
+        elif key.startswith("BTN_") or key.startswith("KEY_"):
             buttons[key] = attr
         elif key.startswith("ABS_"):
             axes[key] = attr
@@ -466,7 +469,7 @@ def parse_uinput_mapping(name, mapping):
             mouse_options[key] = attr
 
     create_mapping(name, description, axes=axes, buttons=buttons,
-                   mouse=mouse, mouse_options=mouse_options)
+                   hats=hats, mouse=mouse, mouse_options=mouse_options)
 
 
 def next_joystick_device():
